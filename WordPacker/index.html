@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Word Packer App</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="WordStyle.js"></script>
+    <script src="WordNode.js"></script>
+    <script src="WordRect.js"></script>
+    <script src="WordPacker.js"></script>
+    <script src="app.js"></script>
+</head>
+    <body>
+        <h1>Word Packer</h1>
+        <p style="display: none;">
+            <span id="percentfull"></span>% full
+            (<span id="pixelstogo"></span> pixels to go)
+        </p>
+        <p style="display: none;">
+            Next piece:
+            <canvas id="nextWord"></canvas>
+        </p>
+        <br />
+        <canvas id="wordBin"></canvas>
+    </body>
+</html>
