@@ -8,7 +8,7 @@ var WordPacker = (function () {
         this.filledArea = 0;
         this.minFontSize = 10;
         this.maxFontSize = 20;
-        this.showRect = true;
+        this.showRect = false;
         this.canvas.width = width;
         this.canvas.height = height;
         this.canvasArea = width * height;
@@ -81,19 +81,12 @@ var WordPacker = (function () {
                 this.ctxCanvas.fillStyle = WordStyle.randomColor();
                 this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
             }
-            //var wp = this;
-            //setTimeout(this.drawWord, Math.floor(Math.random() * (1000 - 1 + 1)) + 1, this.ctxCanvas, nextRect);
             this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
             this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + rect.wordStyle.fontSize);
             this.filledArea += nextRect.width * nextRect.height;
         }
         return newNode;
     };
-    //drawWord(canvas: CanvasRenderingContext2D, rect: WordRect) : void 
-    //{
-    //    canvas.fillStyle = rect.wordStyle.fontColor;
-    //    canvas.fillText(rect.word, rect.x, rect.y + rect.wordStyle.fontSize);
-    //}
     WordPacker.prototype.verticalPack = function (rect) {
         var newNode = this.firstPackedNode.insert(rect);
         if (this.isPinIntersect(newNode)) {
@@ -105,16 +98,6 @@ var WordPacker = (function () {
                 this.ctxCanvas.fillStyle = WordStyle.randomColor();
                 this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
             }
-            var wp = this;
-            //setTimeout(function ()
-            //{
-            //    wp.ctxCanvas.save();
-            //    wp.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            //    wp.ctxCanvas.translate(nextRect.x, nextRect.y);
-            //    wp.ctxCanvas.rotate(90 * Math.PI / 180);
-            //    wp.ctxCanvas.fillText(nextRect.word, 0, 0);
-            //    wp.ctxCanvas.restore();
-            //}, Math.floor(Math.random() * (1000 - 1 + 1)) + 1);
             this.ctxCanvas.save();
             this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
             this.ctxCanvas.translate(nextRect.x, nextRect.y);
@@ -129,7 +112,6 @@ var WordPacker = (function () {
         var i = 0, percentCompleted, attempts = 0;
         do {
             var lastNode;
-            //var wp: WordPacker = this;
             attempts++;
             if (Math.random() > 0.3) {
                 var rect = this.randomRect(words[i++]);
@@ -147,15 +129,6 @@ var WordPacker = (function () {
             }
             percentCompleted = (this.filledArea / this.canvasArea) * 100;
         } while (percentCompleted < 80 && attempts < 100);
-    };
-    WordPacker.prototype.sleep = function (ms) {
-        var max_sec = new Date().getTime();
-        var elapsed = false;
-        do {
-            if (new Date().getTime() > max_sec + ms) {
-                elapsed = true;
-            }
-        } while (elapsed == false);
     };
     return WordPacker;
 })();
