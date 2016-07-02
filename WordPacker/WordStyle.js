@@ -1,4 +1,10 @@
+/// <summary>
+/// WordStyle contains the basic styling used when drawing a WordNode.
+/// </summary>
 var WordStyle = (function () {
+    /// <summary>
+    /// Constructor used to initialize word style.
+    /// </summary>
     function WordStyle(fontSize, fontColor, fontFamily, fontWeight) {
         if (fontWeight === void 0) { fontWeight = ""; }
         this.fontSize = fontSize;
@@ -6,10 +12,9 @@ var WordStyle = (function () {
         this.fontFamily = fontFamily;
         this.fontWeight = fontWeight;
     }
-    WordStyle.prototype.getFontStyle = function () {
-        var style = this.fontWeight + ' ' + this.fontSize.toString() + 'px ' + this.fontFamily;
-        return style.trim();
-    };
+    /// <summary>
+    /// Randomly pick from within a specific RGA color scheme.
+    /// </summary>
     WordStyle.rgbaColorScheme = function () {
         var randNumber = Math.random();
         var randAlpha = Math.floor((Math.random() * (7.5 - 1)) + 1) / 10;
@@ -29,6 +34,9 @@ var WordStyle = (function () {
             return "rgba(0, 0, 0, " + randAlpha.toString() + ")";
         }
     };
+    /// <summary>
+    /// Randomly pick an RGA color.
+    /// </summary>
     WordStyle.randomColor = function () {
         var color = [0, 0, 0];
         for (var i = 0; i <= 2; i++) {
@@ -36,6 +44,13 @@ var WordStyle = (function () {
                 color[i] = Math.floor(32 + Math.random() * 192);
         }
         return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+    };
+    /// <summary>
+    /// Convert the WordStyle into a css font style string.
+    /// </summary>
+    WordStyle.prototype.getFontStyle = function () {
+        var style = this.fontWeight + ' ' + this.fontSize.toString() + 'px ' + this.fontFamily;
+        return style.trim();
     };
     return WordStyle;
 })();

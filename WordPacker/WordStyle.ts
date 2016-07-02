@@ -1,15 +1,18 @@
-﻿class WordStyle
+﻿/// <summary>
+/// WordStyle contains the basic styling used when drawing a WordNode.
+/// </summary>
+class WordStyle
 {
+    /// <summary>
+    /// Constructor used to initialize word style.
+    /// </summary>
     constructor(public fontSize: number, public fontColor: string,
                 public fontFamily: string, public fontWeight: string = "")
     {}
 
-    getFontStyle(): string
-    {
-        var style: string = this.fontWeight + ' ' + this.fontSize.toString() + 'px ' + this.fontFamily;
-        return style.trim();   
-    }
-
+    /// <summary>
+    /// Randomly pick from within a specific RGA color scheme.
+    /// </summary>
     static rgbaColorScheme(): string
     {
         var randNumber: number = Math.random();
@@ -37,6 +40,9 @@
         }
     }
 
+    /// <summary>
+    /// Randomly pick an RGA color.
+    /// </summary>
     static randomColor(): string
     {
         var color = [0, 0, 0];
@@ -47,5 +53,14 @@
                 color[i] = Math.floor(32 + Math.random() * 192);
         }
         return 'rgb(' + color[0] + ',' + color[1] + ',' + color[2] + ')';
+    }
+
+    /// <summary>
+    /// Convert the WordStyle into a css font style string.
+    /// </summary>
+    getFontStyle(): string
+    {
+        var style: string = this.fontWeight + ' ' + this.fontSize.toString() + 'px ' + this.fontFamily;
+        return style.trim();
     }
 }

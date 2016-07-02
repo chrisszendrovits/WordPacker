@@ -1,18 +1,28 @@
-﻿class WordNode
+﻿/// <summary>
+/// WordNode is a single node, in a linked list.
+/// </summary>
+class WordNode
 {
     leftNode: WordNode;
     rightNode: WordNode;
     wordRect: WordRect;
     filled: boolean;
+    isVertical: boolean;
 
+    /// <summary>
+    /// Constructor used to initialize the a new node.
+    /// </summary>
     constructor()
     {
         this.leftNode = null;
         this.rightNode = null;
         this.wordRect = null;
         this.filled = false;
+        this.isVertical = false;
     }
 
+    /// <summary>Add a WordRect to the node on the right.</summary>
+    /// <returns>The WordNode that the WordRect was added to.</returns>
     addRight(rect: WordRect): WordNode
     {
         if (this.rightNode != null)
@@ -32,10 +42,12 @@
         return this.rightNode;
     }
 
-    insert(rect: WordRect): WordNode
+    /// <summary>Recursively add a WordRect to the linked list of nodes.</summary>
+    /// <returns>The WordNode that the WordRect was added to.</returns>
+    add(rect: WordRect): WordNode
     {
         if (this.leftNode != null)
-            return this.leftNode.insert(rect) || this.rightNode.insert(rect);
+            return this.leftNode.add(rect) || this.rightNode.add(rect);
 
         if (this.filled)
             return null;
@@ -55,26 +67,19 @@
         var widthDiff = this.wordRect.width - rect.width;
         var heightDiff = this.wordRect.height - rect.height;
 
-        var insertRect: string = '';
-
         if (widthDiff > heightDiff)
         {
             // Split area into left and right, putting the rect on the left
             this.leftNode.wordRect = new WordRect(rect.width, this.wordRect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
             this.rightNode.wordRect = new WordRect(this.wordRect.width - rect.width, this.wordRect.height, this.wordRect.x + rect.width, this.wordRect.y, rect.word, rect.wordStyle);
-            insertRect += 'left';
         }
         else
         {
             // Split area into top and bottom, putting rect on top
             this.leftNode.wordRect = new WordRect(this.wordRect.width, rect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
             this.rightNode.wordRect = new WordRect(this.wordRect.width, this.wordRect.height - rect.height, this.wordRect.x, this.wordRect.y + rect.height, rect.word, rect.wordStyle);
-            insertRect += 'top';
         }
 
-        insertRect += " leftNode: " + this.leftNode.wordRect.x + ', ' + this.leftNode.wordRect.y + ', ' + this.leftNode.wordRect.width + ', ' + this.leftNode.wordRect.height;
-        //console.log(insertRect);
-
-        return this.leftNode.insert(rect);
+        return this.leftNode.add(rect);
     }
 }

@@ -1,4 +1,14 @@
+/// <summary>
+/// Word Packer, which is based on a simple packing algorithm, will insert text, 
+/// both horizontally and vertically, into a canvas area.
+/// </summary>
 var WordPacker = (function () {
+    /// <summary>
+    /// Constructor used to initialize the canvas area.
+    /// </summary>
+    /// <param name="canvas">The HTML5 canvas element, used by Word Packer.</param>
+    /// <param name="width">The width of the canvas.</param>
+    /// <param name="height">The height of the canvas.</param>
     function WordPacker(canvas, width, height) {
         this.canvas = canvas;
         this.width = width;
@@ -15,14 +25,27 @@ var WordPacker = (function () {
         this.ctxCanvas = this.canvas.getContext("2d");
         this.firstPackedNode.wordRect = new WordRect(width, height);
     }
+    /// <summary>
+    /// Randomly generate a number within the specified range.
+    /// </summary>
+    WordPacker.randomNumber = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    /// <summary>
+    /// Gets the length of a word, in pixels.
+    /// </summary>
+    /// <param name="word">The word that needs to be measured.</param>
+    /// <param name="wordStyle">The font styling of the word.</param>
     WordPacker.prototype.getWordWidth = function (word, wordStyle) {
         this.ctxCanvas.font = wordStyle.getFontStyle();
         var textMetric = this.ctxCanvas.measureText(word);
         return Math.ceil(textMetric.width);
     };
-    WordPacker.randomNumber = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
+    /// <summary>
+    /// Creates a WordRect within a randomly selected range of font sizes.
+    /// </summary>
+    /// <param name="word">The text used to create the WordRect.</param>
+    /// <param name="showVertical">Display the word vertically.</param>
     WordPacker.prototype.randomRect = function (word, showVertical, x, y) {
         if (showVertical === void 0) { showVertical = false; }
         if (x === void 0) { x = 0; }
@@ -40,6 +63,14 @@ var WordPacker = (function () {
         }
         return new WordRect(rectWidth, rectHeight, x, y, word, wordStyle);
     };
+    /// <summary>
+    /// Pin text to the canvas. A pinned WordNode will appear at specific
+    /// coordinates (x,y) on the canvas, and will not intersect with any packed words.
+    /// </summary>
+    /// <param name="word">The text used to pin to the canvas.</param>
+    /// <param name="x">The x coordinate of the pin.</param>
+    /// <param name="y">The y coordinate of the pin.</param>
+    /// <param name="wordStyle">The font styling on the text.</param>
     WordPacker.prototype.pinWord = function (word, x, y, wordStyle) {
         var rect = new WordRect(this.getWordWidth(word, wordStyle), wordStyle.fontSize, x, y, word, wordStyle);
         var newNode = this.firstPinnedNode.addRight(rect);
@@ -54,6 +85,9 @@ var WordPacker = (function () {
         }
         return newNode;
     };
+    /// <summary>
+    /// Check if a node intersects will any existing pinned words.
+    /// </summary>
     WordPacker.prototype.isPinIntersect = function (node) {
         var intersect = false;
         var iterNode = this.firstPinnedNode;
@@ -70,30 +104,28 @@ var WordPacker = (function () {
         }
         return intersect;
     };
-    WordPacker.prototype.horizontalPack = function (rect) {
-        var newNode = this.firstPackedNode.insert(rect);
+    /// <summary>
+    /// Attempt to add, or pack, a new node into the node list.
+    /// </summary>
+    /// <returns>
+    /// The new node if successful. Or null, if unable to find space for the WordRect.
+    /// </returns>
+    WordPacker.prototype.insertWordNode = function (rect) {
+        var newNode = this.firstPackedNode.add(rect);
         if (this.isPinIntersect(newNode)) {
             newNode = null;
         }
         if (newNode) {
-            var nextRect = newNode.wordRect;
-            if (this.showRect) {
-                this.ctxCanvas.fillStyle = WordStyle.randomColor();
-                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
-            }
-            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + rect.wordStyle.fontSize);
-            this.filledArea += nextRect.width * nextRect.height;
+            this.filledArea += newNode.wordRect.width * newNode.wordRect.height;
         }
         return newNode;
     };
-    WordPacker.prototype.verticalPack = function (rect) {
-        var newNode = this.firstPackedNode.insert(rect);
-        if (this.isPinIntersect(newNode)) {
-            newNode = null;
-        }
-        if (newNode) {
-            var nextRect = newNode.wordRect;
+    /// <summary>
+    /// Draw a newly inserted WordNode on the canvas.
+    /// </summary>
+    WordPacker.prototype.drawNode = function (node) {
+        var nextRect = node.wordRect;
+        if (node.isVertical) {
             if (this.showRect) {
                 this.ctxCanvas.fillStyle = WordStyle.randomColor();
                 this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
@@ -104,25 +136,30 @@ var WordPacker = (function () {
             this.ctxCanvas.rotate(90 * Math.PI / 180);
             this.ctxCanvas.fillText(nextRect.word, 0, 0);
             this.ctxCanvas.restore();
-            this.filledArea += nextRect.width * nextRect.height;
         }
-        return newNode;
+        else {
+            if (this.showRect) {
+                this.ctxCanvas.fillStyle = WordStyle.randomColor();
+                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
+            }
+            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
+            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + nextRect.wordStyle.fontSize);
+        }
     };
+    /// <summary>
+    /// Pack an array of words, both vertically and horizontally, into the canvas.
+    /// </summary>
     WordPacker.prototype.packWords = function (words) {
         var i = 0, percentCompleted, attempts = 0;
         do {
-            var lastNode;
+            var isVertical = (Math.random() <= 0.3) ? true : false;
+            var rect = this.randomRect(words[i++], isVertical);
+            var newNode = this.insertWordNode(rect);
             attempts++;
-            if (Math.random() > 0.3) {
-                var rect = this.randomRect(words[i++]);
-                lastNode = this.horizontalPack(rect);
-            }
-            else {
-                var rect = this.randomRect(words[i++], true);
-                lastNode = this.verticalPack(rect);
-            }
-            if (lastNode) {
+            if (newNode) {
                 attempts = 0;
+                newNode.isVertical = isVertical;
+                this.drawNode(newNode);
             }
             if (i >= words.length) {
                 i = 0;

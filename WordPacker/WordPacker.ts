@@ -1,4 +1,8 @@
-﻿class WordPacker
+﻿/// <summary>
+/// Word Packer, which is based on a simple packing algorithm, will insert text, 
+/// both horizontally and vertically, into a canvas area.
+/// </summary>
+class WordPacker
 {
     private ctxCanvas: CanvasRenderingContext2D;
     private firstPackedNode: WordNode = new WordNode();
@@ -10,6 +14,12 @@
     public maxFontSize: number = 20;
     public showRect: boolean = false;
 
+    /// <summary>
+    /// Constructor used to initialize the canvas area.
+    /// </summary>
+    /// <param name="canvas">The HTML5 canvas element, used by Word Packer.</param>
+    /// <param name="width">The width of the canvas.</param>
+    /// <param name="height">The height of the canvas.</param>
     constructor(private canvas: HTMLCanvasElement, public width: number, public height: number)
     {
         this.canvas.width = width;
@@ -19,6 +29,19 @@
         this.firstPackedNode.wordRect = new WordRect(width, height);
     }
 
+    /// <summary>
+    /// Randomly generate a number within the specified range.
+    /// </summary>
+    static randomNumber(min: number, max: number): number
+    {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    /// <summary>
+    /// Gets the length of a word, in pixels.
+    /// </summary>
+    /// <param name="word">The word that needs to be measured.</param>
+    /// <param name="wordStyle">The font styling of the word.</param>
     getWordWidth(word: string, wordStyle: WordStyle): number
     {
         this.ctxCanvas.font = wordStyle.getFontStyle();
@@ -27,11 +50,11 @@
         return Math.ceil(textMetric.width);
     }
 
-    static randomNumber(min: number, max: number): number
-    {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
+    /// <summary>
+    /// Creates a WordRect within a randomly selected range of font sizes.
+    /// </summary>
+    /// <param name="word">The text used to create the WordRect.</param>
+    /// <param name="showVertical">Display the word vertically.</param>
     randomRect(word: string, showVertical: boolean = false, x: number = 0, y: number = 0): WordRect
     {
         var randFontSize: number = WordPacker.randomNumber(this.minFontSize, this.maxFontSize);
@@ -53,6 +76,14 @@
         return new WordRect(rectWidth, rectHeight, x, y, word, wordStyle);
     }
 
+    /// <summary>
+    /// Pin text to the canvas. A pinned WordNode will appear at specific
+    /// coordinates (x,y) on the canvas, and will not intersect with any packed words.
+    /// </summary>
+    /// <param name="word">The text used to pin to the canvas.</param>
+    /// <param name="x">The x coordinate of the pin.</param>
+    /// <param name="y">The y coordinate of the pin.</param>
+    /// <param name="wordStyle">The font styling on the text.</param>
     pinWord(word: string, x: number, y: number, wordStyle: WordStyle): WordNode
     {
         var rect: WordRect = new WordRect(this.getWordWidth(word, wordStyle),
@@ -75,6 +106,9 @@
         return newNode;
     }
 
+    /// <summary>
+    /// Check if a node intersects will any existing pinned words.
+    /// </summary>
     isPinIntersect(node: WordNode): boolean
     {
         var intersect: boolean = false;
@@ -98,10 +132,16 @@
         }
         return intersect;
     }
-
-    horizontalPack(rect: WordRect): WordNode
+    
+    /// <summary>
+    /// Attempt to add, or pack, a new node into the node list.
+    /// </summary>
+    /// <returns>
+    /// The new node if successful. Or null, if unable to find space for the WordRect.
+    /// </returns>
+    insertWordNode(rect: WordRect): WordNode
     {
-        var newNode: WordNode = this.firstPackedNode.insert(rect);
+        var newNode: WordNode = this.firstPackedNode.add(rect);
 
         if (this.isPinIntersect(newNode))
         {
@@ -110,76 +150,66 @@
 
         if (newNode)
         {
-            var nextRect = newNode.wordRect;
-
-            if (this.showRect)
-            {
-                this.ctxCanvas.fillStyle = WordStyle.randomColor();
-                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
-            }
-
-            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + rect.wordStyle.fontSize);
-
-            this.filledArea += nextRect.width * nextRect.height;
-        }
-        return newNode;
-    }
-
-    verticalPack(rect: WordRect): WordNode
-    {
-        var newNode: WordNode = this.firstPackedNode.insert(rect);
-
-        if (this.isPinIntersect(newNode))
-        {
-            newNode = null;
-        }
-
-        if (newNode)
-        {
-            var nextRect = newNode.wordRect;
-
-            if (this.showRect)
-            {
-                this.ctxCanvas.fillStyle = WordStyle.randomColor();
-                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
-            }
-            
-            this.ctxCanvas.save();
-            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            this.ctxCanvas.translate(nextRect.x, nextRect.y);
-            this.ctxCanvas.rotate(90*Math.PI/180);
-            this.ctxCanvas.fillText(nextRect.word, 0, 0);
-            this.ctxCanvas.restore();
-
-            this.filledArea += nextRect.width * nextRect.height;
+            this.filledArea += newNode.wordRect.width * newNode.wordRect.height;
         }
         return newNode;
     }
     
+    /// <summary>
+    /// Draw a newly inserted WordNode on the canvas.
+    /// </summary>
+    drawNode(node: WordNode)
+    {
+        var nextRect = node.wordRect;
+
+        if (node.isVertical)
+        {
+            if (this.showRect)
+            {
+                this.ctxCanvas.fillStyle = WordStyle.randomColor();
+                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
+            }
+
+            this.ctxCanvas.save();
+            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
+            this.ctxCanvas.translate(nextRect.x, nextRect.y);
+            this.ctxCanvas.rotate(90 * Math.PI / 180);
+            this.ctxCanvas.fillText(nextRect.word, 0, 0);
+            this.ctxCanvas.restore();
+        }
+        else
+        {
+            if (this.showRect)
+            {
+                this.ctxCanvas.fillStyle = WordStyle.randomColor();
+                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
+            }
+
+            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
+            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + nextRect.wordStyle.fontSize);
+        }
+    }
+
+    /// <summary>
+    /// Pack an array of words, both vertically and horizontally, into the canvas.
+    /// </summary>
     packWords(words: string[])
     {
         var i: number = 0, percentCompleted: number, attempts = 0;
 
         do
         {
-            var lastNode: WordNode;
+            var isVertical: boolean = (Math.random() <= 0.3) ? true : false;
+            var rect: WordRect = this.randomRect(words[i++], isVertical);
+            var newNode: WordNode = this.insertWordNode(rect);
+
             attempts++
 
-            if (Math.random() > 0.3)
-            {
-                var rect: WordRect = this.randomRect(words[i++]);
-                lastNode = this.horizontalPack(rect);
-            }
-            else
-            {
-                var rect: WordRect = this.randomRect(words[i++], true);
-                lastNode = this.verticalPack(rect);
-            }
-
-            if (lastNode)
+            if (newNode)
             {
                 attempts = 0;
+                newNode.isVertical = isVertical;
+                this.drawNode(newNode);
             }
 
             if (i >= words.length)

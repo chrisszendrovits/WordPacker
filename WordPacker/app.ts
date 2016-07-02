@@ -1,41 +1,8 @@
-﻿class AppMain
-{
-    nextWord: HTMLCanvasElement;
-    ctxNextWord: CanvasRenderingContext2D;
-
-    percentFull: HTMLSpanElement;
-    pixelsToFill: HTMLSpanElement;
-    aspectRadio: number = 0.6;
-
-    constructor(nextWord: HTMLCanvasElement, percentFull: HTMLSpanElement, pixelsToFill: HTMLSpanElement)
-    {
-        this.nextWord = nextWord;
-        this.percentFull = percentFull;
-        this.pixelsToFill = pixelsToFill;
-    }
-
-    setCanvasSize(width: number, height: number)
-    {
-        this.nextWord.width = width;
-        this.nextWord.height = height;
-        this.ctxNextWord = this.nextWord.getContext("2d");
-    }
-
-    updateNextWordSize(fontSize: number, numChars: number)
-    {
-        this.nextWord.height = fontSize;
-        this.nextWord.width = (fontSize * this.aspectRadio) * numChars;
-    }
-}
-
+﻿/// <summary>
+/// Initialize the WordPacker and provide it with a list of words to pack.
+/// </summary>
 window.onload = () =>
 {
-    var nextWord = <HTMLCanvasElement>document.getElementById('nextWord');
-    var percentFull = <HTMLSpanElement>document.getElementById('percentfull');
-    var pixelsToFill = <HTMLSpanElement>document.getElementById('pixelstogo');
-    var app = new AppMain(nextWord, percentFull, pixelsToFill);   
-    app.setCanvasSize(25, 25);
-
     var bin = <HTMLCanvasElement>document.getElementById('wordBin');
     var words = ["asp.net", "dedicated", "team player", "proactive", "problem solver",
         "detail oriented", "javascript", "agile", "full stack", "developer",

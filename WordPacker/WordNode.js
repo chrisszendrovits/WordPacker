@@ -1,10 +1,19 @@
+/// <summary>
+/// WordNode is a single node, in a linked list.
+/// </summary>
 var WordNode = (function () {
+    /// <summary>
+    /// Constructor used to initialize the a new node.
+    /// </summary>
     function WordNode() {
         this.leftNode = null;
         this.rightNode = null;
         this.wordRect = null;
         this.filled = false;
+        this.isVertical = false;
     }
+    /// <summary>Add a WordRect to the node on the right.</summary>
+    /// <returns>The WordNode that the WordRect was added to.</returns>
     WordNode.prototype.addRight = function (rect) {
         if (this.rightNode != null) {
             return this.rightNode.addRight(rect);
@@ -18,9 +27,11 @@ var WordNode = (function () {
         this.rightNode.filled = true;
         return this.rightNode;
     };
-    WordNode.prototype.insert = function (rect) {
+    /// <summary>Recursively add a WordRect to the linked list of nodes.</summary>
+    /// <returns>The WordNode that the WordRect was added to.</returns>
+    WordNode.prototype.add = function (rect) {
         if (this.leftNode != null)
-            return this.leftNode.insert(rect) || this.rightNode.insert(rect);
+            return this.leftNode.add(rect) || this.rightNode.add(rect);
         if (this.filled)
             return null;
         if (!rect.fitsIn(this.wordRect))
@@ -33,22 +44,17 @@ var WordNode = (function () {
         this.rightNode = new WordNode();
         var widthDiff = this.wordRect.width - rect.width;
         var heightDiff = this.wordRect.height - rect.height;
-        var insertRect = '';
         if (widthDiff > heightDiff) {
             // Split area into left and right, putting the rect on the left
             this.leftNode.wordRect = new WordRect(rect.width, this.wordRect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
             this.rightNode.wordRect = new WordRect(this.wordRect.width - rect.width, this.wordRect.height, this.wordRect.x + rect.width, this.wordRect.y, rect.word, rect.wordStyle);
-            insertRect += 'left';
         }
         else {
             // Split area into top and bottom, putting rect on top
             this.leftNode.wordRect = new WordRect(this.wordRect.width, rect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
             this.rightNode.wordRect = new WordRect(this.wordRect.width, this.wordRect.height - rect.height, this.wordRect.x, this.wordRect.y + rect.height, rect.word, rect.wordStyle);
-            insertRect += 'top';
         }
-        insertRect += " leftNode: " + this.leftNode.wordRect.x + ', ' + this.leftNode.wordRect.y + ', ' + this.leftNode.wordRect.width + ', ' + this.leftNode.wordRect.height;
-        //console.log(insertRect);
-        return this.leftNode.insert(rect);
+        return this.leftNode.add(rect);
     };
     return WordNode;
 })();
