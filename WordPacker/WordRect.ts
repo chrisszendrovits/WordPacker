@@ -1,15 +1,40 @@
 ﻿/// <summary>
 /// WordRect is used to encapsulate all the data needed to display an instance of text.
 /// </summary>
+interface iWordRect
+{
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    word: string;
+    wordStyle: WordStyle;
+}
+
+/// <summary>
+/// WordRect is used to encapsulate all the data needed to display an instance of text.
+/// </summary>
 class WordRect
 {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    word: string;
+    wordStyle: WordStyle;
+    
     /// <summary>
-    /// Constructor used to initialize the WordRect.
+    /// Constructor used to initialize the WordRect. Can be used as a copy constructor.
     /// </summary>
-    constructor(public width: number, public height: number,
-                public x: number = 0, public y: number = 0,
-                public word: string = "", public wordStyle: WordStyle = null)
-    {}
+    constructor(wordRect: iWordRect)
+    {
+        this.width = wordRect.width;
+        this.height = wordRect.height;
+        this.x = wordRect.x;
+        this.y = wordRect.y;
+        this.word = wordRect.word;
+        this.wordStyle = wordRect.wordStyle;
+    }
 
     /// <summary>
     /// Check if a WordRect fits within another WordRect.
@@ -20,7 +45,7 @@ class WordRect
     }
 
     /// <summary>
-    /// Check if a WordRect is equal to another WordRect.
+    /// Check if a WordRect's dimensions are identical to another WordRect.
     /// </summary>
     isSizeEqual(rect: WordRect): boolean
     {
@@ -43,5 +68,20 @@ class WordRect
         {
             return true;
         }
+    }
+
+    /// <summary>
+    /// Returns a WordRect interface containing the object's data members.
+    /// </summary>
+    getWordRect(): iWordRect
+    {
+        return {
+            width: this.width,
+            height: this.height,
+            x: this.x,
+            y: this.y,
+            word: this.word,
+            wordStyle: this.wordStyle
+        };
     }
 }

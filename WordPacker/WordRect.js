@@ -3,19 +3,15 @@
 /// </summary>
 var WordRect = (function () {
     /// <summary>
-    /// Constructor used to initialize the WordRect.
+    /// Constructor used to initialize the WordRect. Can be used as a copy constructor.
     /// </summary>
-    function WordRect(width, height, x, y, word, wordStyle) {
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (word === void 0) { word = ""; }
-        if (wordStyle === void 0) { wordStyle = null; }
-        this.width = width;
-        this.height = height;
-        this.x = x;
-        this.y = y;
-        this.word = word;
-        this.wordStyle = wordStyle;
+    function WordRect(wordRect) {
+        this.width = wordRect.width;
+        this.height = wordRect.height;
+        this.x = wordRect.x;
+        this.y = wordRect.y;
+        this.word = wordRect.word;
+        this.wordStyle = wordRect.wordStyle;
     }
     /// <summary>
     /// Check if a WordRect fits within another WordRect.
@@ -24,7 +20,7 @@ var WordRect = (function () {
         return rect.width >= this.width && rect.height >= this.height;
     };
     /// <summary>
-    /// Check if a WordRect is equal to another WordRect.
+    /// Check if a WordRect's dimensions are identical to another WordRect.
     /// </summary>
     WordRect.prototype.isSizeEqual = function (rect) {
         return this.width == rect.width && this.height == rect.height;
@@ -41,6 +37,19 @@ var WordRect = (function () {
         else {
             return true;
         }
+    };
+    /// <summary>
+    /// Returns a WordRect interface containing the object's data members.
+    /// </summary>
+    WordRect.prototype.getWordRect = function () {
+        return {
+            width: this.width,
+            height: this.height,
+            x: this.x,
+            y: this.y,
+            word: this.word,
+            wordStyle: this.wordStyle
+        };
     };
     return WordRect;
 })();

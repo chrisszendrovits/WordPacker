@@ -26,7 +26,14 @@ class WordPacker
         this.canvas.height = height;
         this.canvasArea = width * height;
         this.ctxCanvas = this.canvas.getContext("2d");
-        this.firstPackedNode.wordRect = new WordRect(width, height);
+        this.firstPackedNode.wordRect = new WordRect({
+            width: width,
+            height: height,
+            x: 0,
+            y: 0,
+            word: "",
+            wordStyle: null
+        });
     }
 
     /// <summary>
@@ -73,7 +80,14 @@ class WordPacker
             rectWidth = this.getWordWidth(word, wordStyle);
         }
 
-        return new WordRect(rectWidth, rectHeight, x, y, word, wordStyle);
+        return new WordRect({
+            width: rectWidth,
+            height: rectHeight,
+            x: x,
+            y: y,
+            word: word,
+            wordStyle: wordStyle
+        });
     }
 
     /// <summary>
@@ -86,8 +100,14 @@ class WordPacker
     /// <param name="wordStyle">The font styling on the text.</param>
     pinWord(word: string, x: number, y: number, wordStyle: WordStyle): WordNode
     {
-        var rect: WordRect = new WordRect(this.getWordWidth(word, wordStyle),
-            wordStyle.fontSize, x, y, word, wordStyle);
+        var rect: WordRect = new WordRect({
+            width: this.getWordWidth(word, wordStyle),
+            height: wordStyle.fontSize,
+            x: x,
+            y: y,
+            word: word,
+            wordStyle: wordStyle
+        });
 
         var newNode: WordNode = this.firstPinnedNode.addRight(rect);
 

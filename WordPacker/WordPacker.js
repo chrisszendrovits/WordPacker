@@ -23,7 +23,14 @@ var WordPacker = (function () {
         this.canvas.height = height;
         this.canvasArea = width * height;
         this.ctxCanvas = this.canvas.getContext("2d");
-        this.firstPackedNode.wordRect = new WordRect(width, height);
+        this.firstPackedNode.wordRect = new WordRect({
+            width: width,
+            height: height,
+            x: 0,
+            y: 0,
+            word: "",
+            wordStyle: null
+        });
     }
     /// <summary>
     /// Randomly generate a number within the specified range.
@@ -61,7 +68,14 @@ var WordPacker = (function () {
             rectHeight = randFontSize;
             rectWidth = this.getWordWidth(word, wordStyle);
         }
-        return new WordRect(rectWidth, rectHeight, x, y, word, wordStyle);
+        return new WordRect({
+            width: rectWidth,
+            height: rectHeight,
+            x: x,
+            y: y,
+            word: word,
+            wordStyle: wordStyle
+        });
     };
     /// <summary>
     /// Pin text to the canvas. A pinned WordNode will appear at specific
@@ -72,7 +86,14 @@ var WordPacker = (function () {
     /// <param name="y">The y coordinate of the pin.</param>
     /// <param name="wordStyle">The font styling on the text.</param>
     WordPacker.prototype.pinWord = function (word, x, y, wordStyle) {
-        var rect = new WordRect(this.getWordWidth(word, wordStyle), wordStyle.fontSize, x, y, word, wordStyle);
+        var rect = new WordRect({
+            width: this.getWordWidth(word, wordStyle),
+            height: wordStyle.fontSize,
+            x: x,
+            y: y,
+            word: word,
+            wordStyle: wordStyle
+        });
         var newNode = this.firstPinnedNode.addRight(rect);
         if (newNode) {
             if (this.showRect) {

@@ -46,13 +46,40 @@ var WordNode = (function () {
         var heightDiff = this.wordRect.height - rect.height;
         if (widthDiff > heightDiff) {
             // Split area into left and right, putting the rect on the left
-            this.leftNode.wordRect = new WordRect(rect.width, this.wordRect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
-            this.rightNode.wordRect = new WordRect(this.wordRect.width - rect.width, this.wordRect.height, this.wordRect.x + rect.width, this.wordRect.y, rect.word, rect.wordStyle);
+            this.leftNode.wordRect = new WordRect({
+                width: rect.width,
+                height: this.wordRect.height,
+                x: this.wordRect.x,
+                y: this.wordRect.y, word: rect.word,
+                wordStyle: rect.wordStyle
+            });
+            this.rightNode.wordRect = new WordRect({
+                width: this.wordRect.width - rect.width,
+                height: this.wordRect.height,
+                x: this.wordRect.x + rect.width,
+                y: this.wordRect.y,
+                word: rect.word,
+                wordStyle: rect.wordStyle
+            });
         }
         else {
             // Split area into top and bottom, putting rect on top
-            this.leftNode.wordRect = new WordRect(this.wordRect.width, rect.height, this.wordRect.x, this.wordRect.y, rect.word, rect.wordStyle);
-            this.rightNode.wordRect = new WordRect(this.wordRect.width, this.wordRect.height - rect.height, this.wordRect.x, this.wordRect.y + rect.height, rect.word, rect.wordStyle);
+            this.leftNode.wordRect = new WordRect({
+                width: this.wordRect.width,
+                height: rect.height,
+                x: this.wordRect.x,
+                y: this.wordRect.y,
+                word: rect.word,
+                wordStyle: rect.wordStyle
+            });
+            this.rightNode.wordRect = new WordRect({
+                width: this.wordRect.width,
+                height: this.wordRect.height - rect.height,
+                x: this.wordRect.x,
+                y: this.wordRect.y + rect.height,
+                word: rect.word,
+                wordStyle: rect.wordStyle
+            });
         }
         return this.leftNode.add(rect);
     };
