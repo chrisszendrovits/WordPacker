@@ -121,9 +121,35 @@ var WordPacker = (function () {
         return newNode;
     };
     /// <summary>
-    /// Draw a newly inserted WordNode on the canvas.
+    /// Draw a WordNode on the canvas.
     /// </summary>
     WordPacker.prototype.drawNode = function (node) {
+        var nextRect = node.wordRect;
+        if (node.isVertical) {
+            if (this.showRect) {
+                this.ctxCanvas.fillStyle = WordStyle.randomColor();
+                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
+            }
+            this.ctxCanvas.save();
+            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
+            this.ctxCanvas.translate(nextRect.x, nextRect.y);
+            this.ctxCanvas.rotate(90 * Math.PI / 180);
+            this.ctxCanvas.fillText(nextRect.word, 0, 0);
+            this.ctxCanvas.restore();
+        }
+        else {
+            if (this.showRect) {
+                this.ctxCanvas.fillStyle = WordStyle.randomColor();
+                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
+            }
+            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
+            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + nextRect.wordStyle.fontSize);
+        }
+    };
+    /// <summary>
+    /// Draw a WordNode on the canvas.
+    /// </summary>
+    WordPacker.prototype.animateNode = function (node) {
         var nextRect = node.wordRect;
         if (node.isVertical) {
             if (this.showRect) {
