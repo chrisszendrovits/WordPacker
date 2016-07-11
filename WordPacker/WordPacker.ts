@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿/// <reference path=".\Scripts\typings\TimerLoop.d.ts" />
+
+/// <summary>
 /// Word Packer, which is based on a simple packing algorithm, will insert text, 
 /// both horizontally and vertically, into a canvas area.
 /// </summary>
@@ -26,7 +28,7 @@ class WordPacker
         this.canvas.height = height;
         this.canvasArea = width * height;
         this.ctxCanvas = this.canvas.getContext("2d");
-        this.firstPackedNode.wordRect = new WordRect({
+        this.firstPackedNode.targetWordRect = new WordRect({
             width: width,
             height: height,
             x: 0,
@@ -134,13 +136,13 @@ class WordPacker
         var intersect: boolean = false;
         var iterNode: WordNode = this.firstPinnedNode;
 
-        if (node != null && node.wordRect != null && iterNode != null )
+        if (node != null && node.targetWordRect != null && iterNode != null )
         {
             do
             {
-                if (iterNode.wordRect != null)
+                if (iterNode.targetWordRect != null)
                 {
-                    if (iterNode.wordRect.intersects(node.wordRect))
+                    if (iterNode.targetWordRect.intersects(node.targetWordRect))
                     {
                         intersect = true;
                         break;
@@ -170,7 +172,7 @@ class WordPacker
 
         if (newNode)
         {
-            this.filledArea += newNode.wordRect.width * newNode.wordRect.height;
+            this.filledArea += newNode.targetWordRect.width * newNode.targetWordRect.height;
         }
         return newNode;
     }
@@ -180,42 +182,7 @@ class WordPacker
     /// </summary>
     drawNode(node: WordNode)
     {
-        var nextRect = node.wordRect;
-
-        if (node.isVertical)
-        {
-            if (this.showRect)
-            {
-                this.ctxCanvas.fillStyle = WordStyle.randomColor();
-                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
-            }
-
-            this.ctxCanvas.save();
-            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            this.ctxCanvas.translate(nextRect.x, nextRect.y);
-            this.ctxCanvas.rotate(90 * Math.PI / 180);
-            this.ctxCanvas.fillText(nextRect.word, 0, 0);
-            this.ctxCanvas.restore();
-        }
-        else
-        {
-            if (this.showRect)
-            {
-                this.ctxCanvas.fillStyle = WordStyle.randomColor();
-                this.ctxCanvas.fillRect(nextRect.x, nextRect.y, nextRect.width, nextRect.height);
-            }
-
-            this.ctxCanvas.fillStyle = nextRect.wordStyle.fontColor;
-            this.ctxCanvas.fillText(nextRect.word, nextRect.x, nextRect.y + nextRect.wordStyle.fontSize);
-        }
-    }
-
-    /// <summary>
-    /// Draw a WordNode on the canvas.
-    /// </summary>
-    animateNode(node: WordNode)
-    {
-        var nextRect = node.wordRect;
+        var nextRect = node.targetWordRect;
 
         if (node.isVertical)
         {
@@ -264,6 +231,7 @@ class WordPacker
             {
                 attempts = 0;
                 newNode.isVertical = isVertical;
+
                 this.drawNode(newNode);
             }
 
@@ -273,6 +241,54 @@ class WordPacker
             }
             
             percentCompleted = (this.filledArea / this.canvasArea) * 100;
+
+        } while (percentCompleted < 80 && attempts < 100);
+    }
+
+    /// <summary>
+    /// Pack an array of words, both vertically and horizontally, using a interval delay
+    /// to animate the drawing process on the canvas.
+    /// </summary>
+    animatePackWords(words: string[], delay: number)
+    {
+        var i: number = 0, percentCompleted: number, attempts = 0;
+        var intervalId: number = 0;
+
+        do
+        {
+            intervalId = TimerLoop.setIntervalWithContext(function ()
+            {
+                var isVertical: boolean = (Math.random() <= 0.3) ? true : false;
+                var rect: WordRect = this.randomRect(words[i++], isVertical);
+                var newNode: WordNode = this.insertWordNode(rect);
+
+                attempts++
+
+                if (newNode)
+                {
+                    attempts = 0;
+                    newNode.isVertical = isVertical;
+                    newNode.currentWordRect = new WordRect(newNode.targetWordRect.getWordRect());
+
+
+                    this.drawNode(newNode);
+
+                    if (newNode.currentWordRect == newNode.targetWordRect)
+                    {
+                        clearInterval(intervalId);
+                    }
+
+
+                }
+
+                if (i >= words.length)
+                {
+                    i = 0;
+                }
+
+                percentCompleted = (this.filledArea / this.canvasArea) * 100;
+
+            }, delay, this);
 
         } while (percentCompleted < 80 && attempts < 100);
     }

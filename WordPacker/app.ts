@@ -8,7 +8,7 @@ window.onload = () =>
         "detail oriented", "javascript", "agile", "full stack", "developer",
         "communicator", "architect", "angularjs", "sql server",
     ];
-    var wp = new WordPacker(bin, 1200, 200);
+    var wp = new WordPacker(bin, 1200, 600);
     
     var title: string = "Chris Szendrovits";
     var fontTitle: WordStyle = new WordStyle(32, "#455372", "Verdana", " bold");
@@ -16,5 +16,5 @@ window.onload = () =>
     var randY: number = WordPacker.randomNumber(wp.height * 0.15, wp.height * 0.7);
 
     wp.pinWord(title, randX, randY, fontTitle);
-    wp.packWords(words);
+    wp.animatePackWords(words, 2);
 };

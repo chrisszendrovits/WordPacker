@@ -8,7 +8,8 @@ var WordNode = (function () {
     function WordNode() {
         this.leftNode = null;
         this.rightNode = null;
-        this.wordRect = null;
+        this.currentWordRect = null;
+        this.targetWordRect = null;
         this.filled = false;
         this.isVertical = false;
     }
@@ -18,12 +19,12 @@ var WordNode = (function () {
         if (this.rightNode != null) {
             return this.rightNode.addRight(rect);
         }
-        else if (this.wordRect == null) {
-            this.wordRect = rect;
+        else if (this.targetWordRect == null) {
+            this.targetWordRect = rect;
             return this;
         }
         this.rightNode = new WordNode();
-        this.rightNode.wordRect = rect;
+        this.rightNode.targetWordRect = rect;
         this.rightNode.filled = true;
         return this.rightNode;
     };
@@ -34,49 +35,49 @@ var WordNode = (function () {
             return this.leftNode.add(rect) || this.rightNode.add(rect);
         if (this.filled)
             return null;
-        if (!rect.fitsIn(this.wordRect))
+        if (!rect.fitsIn(this.targetWordRect))
             return null;
-        if (rect.isSizeEqual(this.wordRect)) {
+        if (rect.isSizeEqual(this.targetWordRect)) {
             this.filled = true;
             return this;
         }
         this.leftNode = new WordNode();
         this.rightNode = new WordNode();
-        var widthDiff = this.wordRect.width - rect.width;
-        var heightDiff = this.wordRect.height - rect.height;
+        var widthDiff = this.targetWordRect.width - rect.width;
+        var heightDiff = this.targetWordRect.height - rect.height;
         if (widthDiff > heightDiff) {
             // Split area into left and right, putting the rect on the left
-            this.leftNode.wordRect = new WordRect({
+            this.leftNode.targetWordRect = new WordRect({
                 width: rect.width,
-                height: this.wordRect.height,
-                x: this.wordRect.x,
-                y: this.wordRect.y, word: rect.word,
+                height: this.targetWordRect.height,
+                x: this.targetWordRect.x,
+                y: this.targetWordRect.y, word: rect.word,
                 wordStyle: rect.wordStyle
             });
-            this.rightNode.wordRect = new WordRect({
-                width: this.wordRect.width - rect.width,
-                height: this.wordRect.height,
-                x: this.wordRect.x + rect.width,
-                y: this.wordRect.y,
+            this.rightNode.targetWordRect = new WordRect({
+                width: this.targetWordRect.width - rect.width,
+                height: this.targetWordRect.height,
+                x: this.targetWordRect.x + rect.width,
+                y: this.targetWordRect.y,
                 word: rect.word,
                 wordStyle: rect.wordStyle
             });
         }
         else {
             // Split area into top and bottom, putting rect on top
-            this.leftNode.wordRect = new WordRect({
-                width: this.wordRect.width,
+            this.leftNode.targetWordRect = new WordRect({
+                width: this.targetWordRect.width,
                 height: rect.height,
-                x: this.wordRect.x,
-                y: this.wordRect.y,
+                x: this.targetWordRect.x,
+                y: this.targetWordRect.y,
                 word: rect.word,
                 wordStyle: rect.wordStyle
             });
-            this.rightNode.wordRect = new WordRect({
-                width: this.wordRect.width,
-                height: this.wordRect.height - rect.height,
-                x: this.wordRect.x,
-                y: this.wordRect.y + rect.height,
+            this.rightNode.targetWordRect = new WordRect({
+                width: this.targetWordRect.width,
+                height: this.targetWordRect.height - rect.height,
+                x: this.targetWordRect.x,
+                y: this.targetWordRect.y + rect.height,
                 word: rect.word,
                 wordStyle: rect.wordStyle
             });

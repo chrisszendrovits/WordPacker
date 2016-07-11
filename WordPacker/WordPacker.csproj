@@ -71,6 +71,9 @@
       <DependentUpon>WordRect.ts</DependentUpon>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\typings\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>
