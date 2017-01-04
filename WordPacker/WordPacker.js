@@ -219,5 +219,5 @@ var WordPacker = (function () {
         } while (percentCompleted < 80 && attempts < 100);
     };
     return WordPacker;
-})();
+}());
 //# sourceMappingURL=WordPacker.js.map

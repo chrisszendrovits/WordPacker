@@ -52,5 +52,5 @@ var WordRect = (function () {
         };
     };
     return WordRect;
-})();
+}());
 //# sourceMappingURL=WordRect.js.map

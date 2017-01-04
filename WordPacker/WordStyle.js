@@ -53,5 +53,5 @@ var WordStyle = (function () {
         return style.trim();
     };
     return WordStyle;
-})();
+}());
 //# sourceMappingURL=WordStyle.js.map

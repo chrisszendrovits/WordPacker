@@ -85,5 +85,5 @@ var WordNode = (function () {
         return this.leftNode.add(rect);
     };
     return WordNode;
-})();
+}());
 //# sourceMappingURL=WordNode.js.map
